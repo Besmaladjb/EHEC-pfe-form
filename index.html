@@ -43,6 +43,9 @@ h2{font-size:30px;margin:22px 0 0;font-weight:800}.sub{color:var(--g);margin:0 0
 .ends{display:flex;justify-content:space-between;gap:12px;color:var(--g);font-size:13px;margin-top:8px}
 textarea{width:100%;min-height:120px;margin-top:14px;padding:12px;border:2px solid var(--l);border-radius:10px;font:inherit;resize:vertical}
 textarea:focus{outline:0;border-color:var(--n)}
+.oth{margin-top:10px}.oth[hidden]{display:none}
+.oth input{width:100%;padding:12px;border:2px solid var(--l);border-radius:10px;font:inherit}
+.oth input:focus{outline:0;border-color:var(--n)}
 .nav{position:fixed;inset-inline:0;bottom:0;background:#fff;border-top:1px solid var(--l);padding:12px 16px;display:flex;justify-content:space-between;max-width:none;z-index:6}
 .nav>*{min-width:120px}.nav button{padding:12px 26px;border-radius:10px;border:2px solid var(--n);background:var(--n);color:#fff;font-weight:600}
 .nav .ghost{background:#fff;color:var(--n)}.nav button:disabled{opacity:.6}
@@ -56,13 +59,14 @@ textarea:focus{outline:0;border-color:var(--n)}
 </style></head><body><div id="app"></div>
 <script src="questions.js"></script>
 <script>
-const URL_='https://script.google.com/macros/s/AKfycbw0D-xekqVHNacFl88FtyyAPiUz9t3ebbXBzk1-Dr01lV5immoUGsnzDWdlvoUy7Nvx/exec';
+const URL_='https://script.google.com/macros/s/AKfycbweIxkg_d59OODma2_-xO26xOavJnYovupscEddmFNdf3U-CFRl4Lh5tmm0C0l9ASXX/exec';
 const SEC=[[0,3],[3,7],[7,12]];
 const S={
 en:{sec:['About you','Career preparation','Your ideal app'],sub:['A few quick details.','How ready do you feel for the job market?','Tell us what would help you most.'],n:'Next',b:'Back',bad:'Please answer this question.',ty:'Your answers were recorded. They will directly shape the career app we are building for students like you.'},
 fr:{sec:['À propos de vous','Préparation à la carrière','Votre application idéale'],sub:['Quelques informations rapides.','Dans quelle mesure vous sentez-vous prêt(e) pour le marché du travail ?','Dites-nous ce qui vous aiderait le plus.'],n:'Suivant',b:'Retour',bad:'Merci de répondre à cette question.',ty:'Vos réponses ont été enregistrées. Elles guideront directement l\'application que nous construisons pour les étudiants comme vous.'},
 ar:{sec:['معلومات عنك','الاستعداد المهني','تطبيقك المثالي'],sub:['بعض المعلومات السريعة.','ما مدى استعدادك لسوق العمل؟','أخبرنا بما يساعدك أكثر.'],n:'التالي',b:'السابق',bad:'يُرجى الإجابة عن هذا السؤال.',ty:'تم تسجيل إجاباتك. ستساهم مباشرة في تصميم التطبيق الذي نبنيه لطلبة مثلك.'}};
-let L='en',st=0;const A={},app=document.getElementById('app'),$=id=>document.getElementById(id);
+let L='en',st=0;const A={},AO={},app=document.getElementById('app'),$=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function pick(){document.documentElement.dir='ltr';
 app.innerHTML=`<div class="hero"><h1>Where are you heading after university?</h1><p lang="fr">Où allez-vous après l'université ?</p><p lang="ar" dir="rtl">إلى أين تتجه بعد الجامعة؟</p><div class="langs">`+
 [['en','English','Start the survey'],['fr','Français','Commencer'],['ar','العربية','ابدأ الاستبيان']].map(l=>`<button class="lcard" onclick="setLang('${l[0]}')"><b>${l[1]}</b><small>${l[2]}</small></button>`).join('')+
@@ -75,23 +79,24 @@ let h=`<div class="wrap"><header class="top"><div class="row"><b class="brand">$
 `</div><div class="bar"><b style="width:${(st+1)*100/3}%"></b></div></header><h2>${p.sec[st]}</h2><p class="sub">${p.sub[st]}</p>`;
 for(let i=s+1;i<=e;i++){const q=Q[i-1],[t,o]=q[L],v=A[i]||[];
 h+=`<section class="q" id="c${i}"><div class="qt"><span class="num">${i}</span><h3>${t}</h3></div>`;
-if(q.k=='o')h+=`<textarea data-i="${i}">${A[i]||''}</textarea>`;
+if(q.k=='o')h+=`<textarea data-i="${i}">${esc(A[i]||'')}</textarea>`;
 else if(q.k=='l')h+=`<div class="sc">`+[1,2,3,4,5].map(x=>`<label><input type="radio" name="q${i}" value="${x}" ${v[0]==x?'checked':''}><span>${x}</span></label>`).join('')+`</div><div class="ends"><span>1 · ${o[0]}</span><span>5 · ${o[1]}</span></div>`;
-else{if(q.k=='m')h+=`<p class="hint">${u.m}</p>`;
-h+=`<div class="opts">`+o.map((x,j)=>`<label class="opt"><input type="${q.k=='m'?'checkbox':'radio'}" name="q${i}" value="${j+1}" ${v.includes(String(j+1))?'checked':''}><span>${x}</span></label>`).join('')+`</div>`}
+else{if(q.k=='m')h+=`<p class="hint">${q.max?u.m:u.ma}</p>`;
+h+=`<div class="opts">`+o.map((x,j)=>`<label class="opt"><input type="${q.k=='m'?'checkbox':'radio'}" name="q${i}" value="${j+1}" ${v.includes(String(j+1))?'checked':''}><span>${x}</span></label>`).join('')+`</div>`;if(q.other)h+=`<div class="oth" id="o${i}" ${v.includes(String(q.other))?'':'hidden'}><input type="text" data-o="${i}" maxlength="200" placeholder="${u.o}" value="${esc(AO[i]||'')}"></div>`}
 h+=`<p class="err">${p.bad}</p></section>`}
 app.innerHTML=h+`<footer class="nav">${st?`<button class="ghost" onclick="go(-1)">${p.b}</button>`:'<span></span>'}<button id="nx" onclick="go(1)">${st==2?u.s:p.n}</button></footer></div>`}
 app.addEventListener('change',e=>{const t=e.target;if(!t.name)return;const i=+t.name.slice(1);
-if(t.type=='checkbox'){const c=[...app.querySelectorAll(`[name=${t.name}]:checked`)];if(c.length>3){t.checked=false;return}A[i]=c.map(x=>x.value)}else A[i]=[t.value];
-$('c'+i).classList.remove('bad')});
-app.addEventListener('input',e=>{if(e.target.dataset.i)A[e.target.dataset.i]=e.target.value});
+if(t.type=='checkbox'){const c=[...app.querySelectorAll(`[name=${t.name}]:checked`)];if(Q[i-1].max&&c.length>Q[i-1].max){t.checked=false;return}A[i]=c.map(x=>x.value)}else A[i]=[t.value];
+$('c'+i).classList.remove('bad');const f=$('o'+i);if(f)f.hidden=!A[i].includes(String(Q[i-1].other))});
+app.addEventListener('input',e=>{const d=e.target.dataset;if(d.i)A[d.i]=e.target.value;else if(d.o)AO[d.o]=e.target.value});
 function go(d){const [s,e]=SEC[st];
 if(d>0){for(let i=s+1;i<=e;i++)if(i!=7&&!(A[i]&&A[i].length)){const c=$('c'+i);c.classList.add('bad');c.scrollIntoView({behavior:'smooth',block:'center'});return}
 if(st<2){st++;wiz();scrollTo(0,0)}else send();return}
 st--;wiz();scrollTo(0,0)}
-async function send(){const b=$('nx');b.disabled=true;b.textContent='…';const r={};
+async function send(){const b=$('nx');b.disabled=true;b.textContent='…';const r={},o={};
 for(let i=1;i<=12;i++)r[i]=i==7?(A[7]||'').trim():A[i].join('|');
-try{await fetch(URL_,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({lang:L,a:r})});
+Q.forEach((q,k)=>{if(q.other&&A[k+1].includes(String(q.other)))o[k+1]=(AO[k+1]||'').trim()});
+try{await fetch(URL_,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({lang:L,a:r,o})});
 app.innerHTML=`<div class="thx"><svg viewBox="0 0 52 52" width="104" aria-hidden="true"><circle cx="26" cy="26" r="24" fill="none" stroke="#ffc83d" stroke-width="3"/><path d="M15 27l8 8 14-16" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg><h1>${UI[L].th}</h1><p>${S[L].ty}</p></div>`;scrollTo(0,0)}
 catch(x){b.disabled=false;b.textContent=UI[L].s;alert('Network error. Please try again.')}}
 pick();

@@ -59,8 +59,8 @@ textarea:focus{outline:0;border-color:var(--n)}
 </style></head><body><div id="app"></div>
 <script src="questions.js"></script>
 <script>
-const URL_='https://script.google.com/macros/s/AKfycbweIxkg_d59OODma2_-xO26xOavJnYovupscEddmFNdf3U-CFRl4Lh5tmm0C0l9ASXX/exec';
-const SEC=[[0,3],[3,7],[7,12]];
+const URL_='https://script.google.com/macros/s/AKfycbx0R_wjx_eYCzZB3A2JimcTgH4oaV333ei4HFwhk_-79jTg_u2arNNsEhEqemP-NoLo/exec';
+const SEC=[[0,4],[4,8],[8,13]];
 const S={
 en:{sec:['About you','Career preparation','Your ideal app'],sub:['A few quick details.','How ready do you feel for the job market?','Tell us what would help you most.'],n:'Next',b:'Back',bad:'Please answer this question.',ty:'Your answers were recorded. They will directly shape the career app we are building for students like you.'},
 fr:{sec:['À propos de vous','Préparation à la carrière','Votre application idéale'],sub:['Quelques informations rapides.','Dans quelle mesure vous sentez-vous prêt(e) pour le marché du travail ?','Dites-nous ce qui vous aiderait le plus.'],n:'Suivant',b:'Retour',bad:'Merci de répondre à cette question.',ty:'Vos réponses ont été enregistrées. Elles guideront directement l\'application que nous construisons pour les étudiants comme vous.'},
@@ -82,7 +82,7 @@ h+=`<section class="q" id="c${i}"><div class="qt"><span class="num">${i}</span><
 if(q.k=='o')h+=`<textarea data-i="${i}">${esc(A[i]||'')}</textarea>`;
 else if(q.k=='l')h+=`<div class="sc">`+[1,2,3,4,5].map(x=>`<label><input type="radio" name="q${i}" value="${x}" ${v[0]==x?'checked':''}><span>${x}</span></label>`).join('')+`</div><div class="ends"><span>1 · ${o[0]}</span><span>5 · ${o[1]}</span></div>`;
 else{if(q.k=='m')h+=`<p class="hint">${q.max?u.m:u.ma}</p>`;
-h+=`<div class="opts">`+o.map((x,j)=>`<label class="opt"><input type="${q.k=='m'?'checkbox':'radio'}" name="q${i}" value="${j+1}" ${v.includes(String(j+1))?'checked':''}><span>${x}</span></label>`).join('')+`</div>`;if(q.other)h+=`<div class="oth" id="o${i}" ${v.includes(String(q.other))?'':'hidden'}><input type="text" data-o="${i}" maxlength="200" placeholder="${u.o}" value="${esc(AO[i]||'')}"></div>`}
+h+=`<div class="opts">`+o.map((x,j)=>`<label class="opt"><input type="${q.k=='m'?'checkbox':'radio'}" name="q${i}" value="${j+1}" ${v.includes(String(j+1))?'checked':''}><span>${x}</span></label>`).join('')+`</div>`;if(q.other)h+=`<div class="oth" id="o${i}" ${v.includes(String(q.other))?'':'hidden'}><input type="text" data-o="${i}" maxlength="200" placeholder="${q.ph?q.ph[L]:u.o}" value="${esc(AO[i]||'')}"></div>`}
 h+=`<p class="err">${p.bad}</p></section>`}
 app.innerHTML=h+`<footer class="nav">${st?`<button class="ghost" onclick="go(-1)">${p.b}</button>`:'<span></span>'}<button id="nx" onclick="go(1)">${st==2?u.s:p.n}</button></footer></div>`}
 app.addEventListener('change',e=>{const t=e.target;if(!t.name)return;const i=+t.name.slice(1);
@@ -90,11 +90,11 @@ if(t.type=='checkbox'){const c=[...app.querySelectorAll(`[name=${t.name}]:checke
 $('c'+i).classList.remove('bad');const f=$('o'+i);if(f)f.hidden=!A[i].includes(String(Q[i-1].other))});
 app.addEventListener('input',e=>{const d=e.target.dataset;if(d.i)A[d.i]=e.target.value;else if(d.o)AO[d.o]=e.target.value});
 function go(d){const [s,e]=SEC[st];
-if(d>0){for(let i=s+1;i<=e;i++)if(i!=7&&!(A[i]&&A[i].length)){const c=$('c'+i);c.classList.add('bad');c.scrollIntoView({behavior:'smooth',block:'center'});return}
+if(d>0){for(let i=s+1;i<=e;i++)if(i!=8&&!(A[i]&&A[i].length)){const c=$('c'+i);c.classList.add('bad');c.scrollIntoView({behavior:'smooth',block:'center'});return}
 if(st<2){st++;wiz();scrollTo(0,0)}else send();return}
 st--;wiz();scrollTo(0,0)}
 async function send(){const b=$('nx');b.disabled=true;b.textContent='…';const r={},o={};
-for(let i=1;i<=12;i++)r[i]=i==7?(A[7]||'').trim():A[i].join('|');
+for(let i=1;i<=13;i++)r[i]=i==8?(A[8]||'').trim():A[i].join('|');
 Q.forEach((q,k)=>{if(q.other&&A[k+1].includes(String(q.other)))o[k+1]=(AO[k+1]||'').trim()});
 try{await fetch(URL_,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({lang:L,a:r,o})});
 app.innerHTML=`<div class="thx"><svg viewBox="0 0 52 52" width="104" aria-hidden="true"><circle cx="26" cy="26" r="24" fill="none" stroke="#ffc83d" stroke-width="3"/><path d="M15 27l8 8 14-16" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg><h1>${UI[L].th}</h1><p>${S[L].ty}</p></div>`;scrollTo(0,0)}

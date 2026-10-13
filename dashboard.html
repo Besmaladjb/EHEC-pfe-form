@@ -27,14 +27,14 @@ table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:6px 8px;b
 <nav id="tabs"><button data-t="ov" class="on">Overview</button><button data-t="qs">All questions</button><button data-t="cx">Cross-analysis</button><button data-t="tx">Open answers</button></nav>
 <main><section id="ov" class="on"></section><section id="qs"></section>
 <section id="cx"><div class="flt" style="padding:0 0 12px;background:none;border:0"><label>Compare groups by<select id="sa"></select></label><label>Show distribution of<select id="sb"></select></label></div><small style="display:block;margin:0 0 10px;color:var(--g)">For multiple-choice questions, one respondent can appear in several groups.</small><div class="c"><div class="w" id="cxw" style="height:420px"><canvas id="cxc"></canvas></div></div><div class="c sc" style="margin-top:14px" id="cxt"></div></section>
-<section id="tx"><div class="flt" style="padding:0 0 12px;background:none;border:0"><label>Show<select id="tq"><option value="">All written answers</option><option value="7">Q7 · Difficulties</option><option value="1">Q1 · Other (level)</option><option value="2">Q2 · Other (field)</option><option value="6">Q6 · Other (obstacle)</option></select></label><input type="search" id="q" placeholder="Search answers…"></div><div class="c" id="txl"></div></section></main>
+<section id="tx"><div class="flt" style="padding:0 0 12px;background:none;border:0"><label>Show<select id="tq"><option value="">All written answers</option><option value="8">Q8 · Difficulties</option><option value="1">Q1 · Other (level)</option><option value="2">Q2 · Other (field)</option><option value="4">Q4 · Country (non-Algerian)</option><option value="7">Q7 · Other (obstacle)</option></select></label><input type="search" id="q" placeholder="Search answers…"></div><div class="c" id="txl"></div></section></main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="questions.js"></script>
 <script>
-const URL_='https://script.google.com/macros/s/AKfycbweIxkg_d59OODma2_-xO26xOavJnYovupscEddmFNdf3U-CFRl4Lh5tmm0C0l9ASXX/exec';
+const URL_='https://script.google.com/macros/s/AKfycbx0R_wjx_eYCzZB3A2JimcTgH4oaV333ei4HFwhk_-79jTg_u2arNNsEhEqemP-NoLo/exec';
 const key=sessionStorage.k||prompt('Dashboard key')||'';if(key)sessionStorage.k=key;
 const $=id=>document.getElementById(id),PAL=['#0e2a47','#ffc83d','#2a9d8f','#e76f51','#6d597a','#4cc9f0','#8d99ae','#b5838d','#588157','#bc6c25','#355070','#e5989b'];
-const LN={en:'English',fr:'French',ar:'Arabic'},ORD=[1,12],OC={1:13,2:14,6:15}; // OC: question number -> column of its "Other" text in each row
+const LN={en:'English',fr:'French',ar:'Arabic'},ORD=[1,13],OC={1:14,2:15,4:16,7:17}; // OC: question number -> column of its "Other" text in each row
 let ALL=[],F={},CH=[],cxc,cur=[];
 const lab=i=>Q[i-1].k=='l'?['1','2','3','4','5']:Q[i-1].en[1];
 const cut=(s,n=42)=>s.length>n?s.slice(0,n-1)+'…':s;
@@ -52,16 +52,16 @@ mk(card(par,t,o.h?60+L.length*30:280,`n = ${o.n||base}${o.m?' · multiple answer
 options:{indexAxis:o.h?'y':'x',maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{title:x=>L[x[0].dataIndex],label:c=>`${c.raw} (${(c.raw/base*100).toFixed(0)}%)`}}},scales:{[o.h?'x':'y']:{beginAtZero:true,ticks:{precision:0}}}}})}
 const topOf=(rs,i)=>{const c=cnt(rs,i),n=n_(rs,i)||1,m=c.indexOf(Math.max(...c));return [lab(i)[m],Math.round(c[m]/n*100)]};
 function render(){CH.forEach(c=>c.destroy());CH=[];const rs=rows();cur=rs;$('cnt').textContent=`${rs.length} / ${ALL.length} responses`;
-const ov=$('ov'),n=rs.length||1,a4=avg(rs,4),a5=avg(rs,5),pay=cnt(rs,12).slice(1,6).reduce((a,b)=>a+b,0);
-ov.innerHTML=`<div class="kpis">`+[[rs.length,'responses'],[a4.toFixed(2)+' / 5','confidence in knowing employer skills'],[a5.toFixed(2)+' / 5','university prepares for real tasks'],[(a5-a4>=0?'+':'')+(a5-a4).toFixed(2),'preparedness minus confidence'],[Math.round(pay/n*100)+'%','would pay for premium'],[topOf(rs,6)[0].slice(0,38),'top obstacle ('+topOf(rs,6)[1]+'%)'],[topOf(rs,8)[0].slice(0,38),'top feature ('+topOf(rs,8)[1]+'%)']].map(k=>`<div class="k"><b style="${String(k[0]).length>12?'font-size:15px':''}">${esc(k[0])}</b><span>${k[1]}</span></div>`).join('')+`</div><div class="grid" id="og"></div>`;
+const ov=$('ov'),n=rs.length||1,a4=avg(rs,5),a5=avg(rs,6),pay=cnt(rs,13).slice(1,6).reduce((a,b)=>a+b,0),pb=(n_(rs,13)-cnt(rs,13)[8])||1;
+ov.innerHTML=`<div class="kpis">`+[[rs.length,'responses'],[a4.toFixed(2)+' / 5','confidence in knowing employer skills'],[a5.toFixed(2)+' / 5','university prepares for real tasks'],[(a5-a4>=0?'+':'')+(a5-a4).toFixed(2),'preparedness minus confidence'],[Math.round(pay/pb*100)+'%','would pay for premium (excl. non-Algerians)'],[topOf(rs,7)[0].slice(0,38),'top obstacle ('+topOf(rs,7)[1]+'%)'],[topOf(rs,9)[0].slice(0,38),'top feature ('+topOf(rs,9)[1]+'%)']].map(k=>`<div class="k"><b style="${String(k[0]).length>12?'font-size:15px':''}">${esc(k[0])}</b><span>${k[1]}</span></div>`).join('')+`</div><div class="grid" id="og"></div>`;
 const g=$('og'),lc=['en','fr','ar'].map(l=>rs.filter(r=>r[0]==l).length);
 bar(g,'Responses by language',['English','Français','العربية'],lc);
 const fl=lab(2),fa=fl.map((_,j)=>rs.filter(r=>r[2]==j+1));
-mk(card(g,'Confidence vs. university preparedness, by field',300,'average score (1–5)'),{type:'bar',data:{labels:fl.map(f=>cut(f,18)),datasets:[{label:'Knows employer skills (Q4)',data:fa.map(x=>+avg(x,4).toFixed(2)),backgroundColor:'#0e2a47'},{label:'Studies prepare (Q5)',data:fa.map(x=>+avg(x,5).toFixed(2)),backgroundColor:'#ffc83d'}]},options:{maintainAspectRatio:false,scales:{y:{min:0,max:5}}}});
-bar(g,Q[5].en[0],lab(6),cnt(rs,6),{h:1,sort:1,m:1,n:n_(rs,6)});
-bar(g,Q[11].en[0],lab(12),cnt(rs,12),{h:1,n:n_(rs,12)});
-bar(g,Q[7].en[0],lab(8),cnt(rs,8),{h:1,sort:1,m:1,n:n_(rs,8)});
-bar(g,Q[10].en[0],lab(11),cnt(rs,11),{h:1,sort:1,m:1,n:n_(rs,11)});
+mk(card(g,'Confidence vs. university preparedness, by field',300,'average score (1–5)'),{type:'bar',data:{labels:fl.map(f=>cut(f,18)),datasets:[{label:'Knows employer skills (Q5)',data:fa.map(x=>+avg(x,5).toFixed(2)),backgroundColor:'#0e2a47'},{label:'Studies prepare (Q6)',data:fa.map(x=>+avg(x,6).toFixed(2)),backgroundColor:'#ffc83d'}]},options:{maintainAspectRatio:false,scales:{y:{min:0,max:5}}}});
+bar(g,Q[6].en[0],lab(7),cnt(rs,7),{h:1,sort:1,m:1,n:n_(rs,7)});
+bar(g,Q[12].en[0],lab(13),cnt(rs,13),{h:1,n:n_(rs,13)});
+bar(g,Q[8].en[0],lab(9),cnt(rs,9),{h:1,sort:1,m:1,n:n_(rs,9)});
+bar(g,Q[11].en[0],lab(12),cnt(rs,12),{h:1,sort:1,m:1,n:n_(rs,12)});
 const qs=$('qs');qs.innerHTML='<div class="grid" id="qg"></div>';
 Q.forEach((q,k)=>{const i=k+1;if(q.k=='o')return;const c=cnt(rs,i);
 bar($('qg'),`${i}. ${q.en[0]}`+(q.k=='l'?` (avg ${avg(rs,i).toFixed(2)})`:''),lab(i),c,{h:q.k!='l',sort:q.k!='l'&&!ORD.includes(i),m:q.k=='m',n:n_(rs,i)})});
@@ -72,14 +72,14 @@ const m=qb.k=='m',data=gi.map(j=>cnt(grp[j],B).map(v=>v/grp[j].length*100)),bi=l
 cxc=new Chart($('cxc'),{type:'bar',data:{labels:gi.map(j=>cut(la[j],30)+` (n=${grp[j].length})`),datasets:bi.map((k,x)=>({label:cut(lb[k],40),data:gi.map((j,y)=>+data[y][k].toFixed(1)),backgroundColor:PAL[x%12]}))},
 options:{indexAxis:'y',maintainAspectRatio:false,scales:{x:{stacked:!m,max:m?100:100,title:{display:true,text:'% of group'}},y:{stacked:!m}},plugins:{legend:{position:'bottom'}}}});
 $('cxt').innerHTML=`<table><tr><th></th>${bi.map(k=>`<th>${esc(cut(lb[k],28))}</th>`).join('')}</tr>`+gi.map(j=>`<tr><th>${esc(cut(la[j],30))} <small>n=${grp[j].length}</small></th>`+bi.map(k=>{const c=cnt(grp[j],B)[k];return `<td>${c} <small>${Math.round(c/grp[j].length*100)}%</small></td>`}).join('')+'</tr>').join('')+'</table>'}
-function tx(){const s=$('q').value.toLowerCase(),w=$('tq').value,f=lab(2),T=[[7,'Q7',7],[1,'Q1 · Other',OC[1]],[2,'Q2 · Other',OC[2]],[6,'Q6 · Other',OC[6]]],out=[];
+function tx(){const s=$('q').value.toLowerCase(),w=$('tq').value,f=lab(2),T=[[8,'Q8',8],[1,'Q1 · Other',OC[1]],[2,'Q2 · Other',OC[2]],[4,'Q4 · Country',OC[4]],[7,'Q7 · Other',OC[7]]],out=[];
 T.forEach(t=>{if(w&&w!=t[0])return;cur.forEach(r=>{const v=r[t[2]];if(v&&v.toLowerCase().includes(s))out.push(`<div class="tx"><i>${r[0].toUpperCase()}</i><i>${esc(cut(f[r[2]-1]||'',24))}</i><i>${t[1]}</i>${esc(v)}</div>`)})});
 $('txl').innerHTML=out.join('')||'<small>No answers.</small>'}
 function init(){const sel=(id,ph,p)=>`<label>${ph}<select data-f="${id}"><option value="">All</option>${p.map(x=>`<option value="${x[0]}">${esc(cut(x[1],40))}</option>`).join('')}</select></label>`;
-$('flt').innerHTML=sel('lang','Language',Object.entries(LN))+[[1,'Level'],[2,'Field'],[3,'Situation']].map(x=>sel(x[0],x[1],lab(x[0]).map((o,j)=>[j+1,o]))).join('');
+$('flt').innerHTML=sel('lang','Language',Object.entries(LN))+[[1,'Level'],[2,'Field'],[3,'Situation'],[4,'From Algeria']].map(x=>sel(x[0],x[1],lab(x[0]).map((o,j)=>[j+1,o]))).join('');
 $('flt').onchange=e=>{F[e.target.dataset.f]=e.target.value;render()};
 const opt=f=>Q.map((q,k)=>f(q)?`<option value="${k+1}">${k+1}. ${esc(cut(q.en[0],60))}</option>`:'').join('');
-$('sa').innerHTML=opt(q=>q.k!='o');$('sb').innerHTML=opt(q=>q.k!='o');$('sa').value=2;$('sb').value=12;
+$('sa').innerHTML=opt(q=>q.k!='o');$('sb').innerHTML=opt(q=>q.k!='o');$('sa').value=2;$('sb').value=13;
 $('sa').onchange=$('sb').onchange=()=>cx();$('q').oninput=tx;$('tq').onchange=tx;
 $('tabs').onclick=e=>{const t=e.target.dataset.t;if(!t)return;document.querySelectorAll('nav button,main>section').forEach(x=>x.classList.remove('on'));e.target.classList.add('on');$(t).classList.add('on')}}
 function csv(){const ok=Object.keys(OC),h=['language',...Q.map((_,k)=>'Q'+(k+1)),...ok.map(k=>'Q'+k+'_other')],q=s=>{s=String(s);if(/^[=+\-@\t\r]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"'};
